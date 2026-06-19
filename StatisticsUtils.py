@@ -4,7 +4,7 @@ import torch.nn as nn
 from PIL import Image
 from sklearn import metrics
 from sklearn.preprocessing import label_binarize
-from scipy import interp
+from numpy import interp
 def SaveTensorImage(image, path):
     image = Image.fromarray((np.array(image.cpu()) * 255).astype(np.uint8)).convert("L")
     if path is None:

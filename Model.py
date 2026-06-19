@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+from tqdm import tqdm
 
 
 # 位置嵌入模块（用于时间步编码）
