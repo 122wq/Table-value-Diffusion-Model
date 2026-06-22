@@ -88,7 +88,7 @@ class ConditionalDiffusion_CycleGAN_tequan_Model(nn.Module):
         noise_fake_proj = self.noise_proj(noise_fake)
 
 
-        if train_falg==0:#训练阶段
+        """if train_falg==0:#训练阶段
 
             #A-B
             # 对抗损失计算-特权信息
@@ -123,21 +123,17 @@ class ConditionalDiffusion_CycleGAN_tequan_Model(nn.Module):
                 'output_ni_real':x_ni_real,
                 'output_ni_fake':x_ni_fake,
             }
-
-        else:
-            validity_fake = self.discriminator(noise_fake.detach())  # #
-
-            x_fake = torch.cat([cond_proj, noise_fake, t_emb], dim=-1)
-            x_fake = self.mid_layers(x_fake)
-            x_fake = self.output_layer(x_fake)
-
-            x_real = torch.cat([cond_proj, noise, t_emb], dim=-1)
-            x_real = self.mid_layers(x_real)
-            x_real = self.output_layer(x_real)
-
-            return {
-                'output_fake': x_fake,#x_fake,
-                'validity_fake': validity_fake,
+        else: """
+        validity_fake = self.discriminator(noise_fake.detach())  # 
+        x_fake = torch.cat([cond_proj, noise_fake, t_emb], dim=-1)
+        x_fake = self.mid_layers(x_fake)
+        x_fake = self.output_layer(x_fake)
+        x_real = torch.cat([cond_proj, noise, t_emb], dim=-1)
+        x_real = self.mid_layers(x_real)
+        x_real = self.output_layer(x_real)
+        return {
+            'output_fake': x_fake,#x_fake,
+            'validity_fake': validity_fake,
             }
 
 
