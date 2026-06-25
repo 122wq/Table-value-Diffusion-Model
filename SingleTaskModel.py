@@ -18,7 +18,7 @@ seed = 42  # 选择一个你喜欢的数字作为种子
 torch.manual_seed(seed)
 T = 500
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-diffusion = DiffusionProcess(T=T, device=device)
+diffusion = DiffusionProcess(T=T, devigfrce=device)
 warnings.filterwarnings("ignore")
 
 
