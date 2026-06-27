@@ -12,7 +12,7 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
         "t": np.array([500], dtype=np.float32),
     }
 )
-    return 100*float(outputs[0][0,0])
+    return abs(100*float(outputs[0][0,0]))
 
 project = gr.Interface(
     fn=greet,
