@@ -1,45 +1,22 @@
-import onnxruntime as ort
-import gradio as gr
-import numpy as np
+import torch
+import torch.nn as nn
+import onnx
+from Model import ConditionalDiffusion_CycleGAN_tequan_Model
 
-sess = ort.InferenceSession("onnx_diffusion.onnx")
+save_dict = torch.load("Fold0Weights_original.pkl", map_location= "cpu", weights_only= True)
+model = ConditionalDiffusion_CycleGAN_tequan_Model(input_dim= 7, output_dim=2)
+model.load_state_dict(save_dict)
+model.eval()
+inputs = (torch.randn(1,2),torch.randn(1,7), torch.tensor([10.0]), False)
 
-def predict(sbp, dbp, egfr, bmi, nraas, htn, age):
-
-    cond = np.array(
-        [[sbp, dbp, egfr, bmi, nraas, htn, age]],
-        dtype=np.float32
-    )
-
-    outputs = sess.run(
-        None,
-        {
-            "cond": cond,
-            "t": np.array([500], dtype=np.float32),
-        }
-    )
-
-    pred = outputs[0][0]
-
-    return float(pred[0]), float(pred[1])
-
-
-demo = gr.Interface(
-    fn=predict,
-    inputs=[
-        gr.Number(label="Clinical SBP"),
-        gr.Number(label="Clinical DBP"),
-        gr.Number(label="eGFR"),
-        gr.Number(label="BMI"),
-        gr.Number(label="nRAAS Drug Use"),
-        gr.Number(label="History of Hypertension"),
-        gr.Number(label="Age"),
-    ],
-    outputs=[
-        gr.Number(label="Output 1"),
-        gr.Number(label="Output 2"),
-    ],
-    title="Diffusion Model Predictor"
+onnx_program = torch.onnx.export(
+    model,
+    inputs,
+    "onnx_diffusion.onnx",
+    input_names=["noise", "cond", "t", "train_flag"],
+    output_names=["output_fake", "validity_fake"],
+    opset_version=17,
 )
 
-demo.launch()
+onnx_model  =onnx.load("onnx_diffusion.onnx")
+onnx.checker.check_model(onnx_model)

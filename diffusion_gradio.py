@@ -12,14 +12,14 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
         "t": np.array([500], dtype=np.float32),
     }
 )
-    return float(outputs[0][0,0]), float(outputs[0][0,1])
+    return 100*float(outputs[0][0,0])
 
 project = gr.Interface(
     fn=greet,
-    inputs=[gr.Number(label="clinical systolic blood pressure"), gr.Number(label="clinical DBP"),
-             gr.Number(label="eGFR"), gr.Number(label="body mass index"), 
-             gr.Number(label="nRAAs drug use"), gr.Number(label="history of hypertension"), gr.Number(label="age")],
-    outputs=[gr.Number(label="a"), gr.Number(label ="b")],
+    inputs=[gr.Number(label="Clinical Systolic Blood Pressure"), gr.Number(label="Clinical DBP"),
+             gr.Number(label="eGFR"), gr.Number(label="Body Mass Index"), 
+             gr.Number(label="nRAAs Drug Use"), gr.Number(label="History of Hypertension"), gr.Number(label="Age")],
+    outputs=[gr.Number(label="NH Prediction (%)")],
     api_name="predict"
 )
-project.launch()
+project.launch(share=True)
