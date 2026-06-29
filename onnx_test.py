@@ -14,4 +14,4 @@ outputs = sess.run(
     }
 )
 
-print(outputs[0][0,1])
+print(outputs[0][0,0])

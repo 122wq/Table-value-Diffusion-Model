@@ -7,6 +7,7 @@ save_dict = torch.load("Fold0Weights_original.pkl", map_location= "cpu", weights
 model = ConditionalDiffusion_CycleGAN_tequan_Model(input_dim= 7, output_dim=2)
 model.load_state_dict(save_dict)
 model.eval()
+#print(model(torch.randn(1,2), torch.tensor([[155, 93.78, 123.394, 26.324, 1, 1, 88]]), torch.tensor([500]), False))
 inputs = (torch.randn(1,2),torch.randn(1,7), torch.tensor([10.0]), False)
 
 onnx_program = torch.onnx.export(
