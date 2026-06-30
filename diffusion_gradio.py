@@ -1,6 +1,7 @@
 import onnxruntime as ort
 import gradio as gr
 import numpy as np
+from scipy.special import softmax
 
 sess = ort.InferenceSession("onnx_diffusion.onnx")
 
@@ -12,7 +13,10 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
         "t": np.array([500], dtype=np.float32),
     }
 )
-    return outputs[0][0,0]
+    output_fake= outputs[0]
+    output_fake = softmax(output_fake, axis = 1)
+    outputs = output_fake[:,1]
+    return outputs[0]
 
 project = gr.Interface(
     fn=greet,
