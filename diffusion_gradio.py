@@ -27,9 +27,9 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
 
 project = gr.Interface(
     fn=greet,
-    inputs=[gr.Number(label="Clinical Systolic Blood Pressure"), gr.Number(label="Clinical DBP"),
-             gr.Number(label="eGFR"), gr.Number(label="Body Mass Index"), 
-             gr.Number(label="nRAAs Drug Use"), gr.Number(label="History of Hypertension"), gr.Number(label="Age", minimum= 0, maximum = 100)],
+    inputs=[gr.Number(label="Clinical Systolic Blood Pressure", minimum= 0, maximum = 300), gr.Number(label="Clinical DBP"),
+             gr.Number(label="eGFR"), gr.Number(label="Body Mass Index", minimum = 0), 
+             gr.Number(label="nRAAs Drug Use", minimum = 0), gr.Number(label="History of Hypertension"), gr.Number(label="Age", minimum= 0, maximum = 100)],
     outputs=[gr.Number(label="NH Prediction (%)"), gr.Textbox(label="Patient Risk")],
     api_name="predict"
 )
