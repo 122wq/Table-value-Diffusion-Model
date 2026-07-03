@@ -29,7 +29,7 @@ project = gr.Interface(
     fn=greet,
     inputs=[gr.Number(label="Clinical Systolic Blood Pressure"), gr.Number(label="Clinical DBP"),
              gr.Number(label="eGFR"), gr.Number(label="Body Mass Index"), 
-             gr.Number(label="nRAAs Drug Use"), gr.Number(label="History of Hypertension"), gr.Number(label="Age")],
+             gr.Number(label="nRAAs Drug Use"), gr.Number(label="History of Hypertension"), gr.Number(label="Age", minimum= 0, maximum = 100)],
     outputs=[gr.Number(label="NH Prediction (%)"), gr.Textbox(label="Patient Risk")],
     api_name="predict"
 )
