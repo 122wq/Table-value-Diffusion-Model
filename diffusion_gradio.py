@@ -10,8 +10,9 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
     outputs = sess.run(
     None,
     {
-        #7 selected varibles as np array
+        #7 selected varibles as input array
         "cond": np.array([[p1, p2, p3, p4, p5, p6, p7]]).astype(np.float32),
+        #diffusion timestep
         "t": np.array([500], dtype=np.float32),
     }
 )
