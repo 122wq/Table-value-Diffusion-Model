@@ -31,13 +31,13 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
     else:
         risk = "Low Risk"
     #return the NH percentage and risk classification
-    return outputs * 100, risk
+    return int(outputs * 100), risk
 
 project = gr.Interface(
     fn=greet,
-    inputs=[gr.Number(label="Clinical Systolic Blood Pressure", minimum= 0, maximum = 300), gr.Number(label="Clinical DBP"),
-             gr.Number(label="eGFR"), gr.Number(label="Body Mass Index", minimum = 0), 
-             gr.Number(label="nRAAs Drug Use", minimum = 0), gr.Number(label="History of Hypertension"), gr.Number(label="Age", minimum= 0, maximum = 100)],
+    inputs=[gr.Number(label="Clinical Systolic Blood Pressure (mmHg)", minimum= 0, maximum = 300), gr.Number(label="Clinical DBP (mmHg)", minimum =0, maximum = 300),
+             gr.Number(label="eGFR (ml/min/1.73m^2)", minimum =0, maximum = 200), gr.Number(label="Body Mass Index (kg/m^2)", minimum = 0, maximum = 50), 
+             gr.Number(label="nRAAs Drug Use", minimum = 0, maximum = 1), gr.Number(label="History of Hypertension", minimum = 0, maximum = 1), gr.Number(label="Age (years)", minimum= 0, maximum = 100)],
     outputs=[gr.Number(label="NH Prediction (%)"), gr.Textbox(label="Patient Risk")],
     api_name="predict"
 )
