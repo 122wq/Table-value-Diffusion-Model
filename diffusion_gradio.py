@@ -22,7 +22,7 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
     output_fake = softmax(output_fake, axis = 1)
     #convert to a single layer array
     outputs = output_fake[:,1]
-    outputs = outputs[0]
+    outputs = float(outputs[0])
     #classify the patient risk based on calculated output percentage
     if (outputs > 0.692):
         risk = "High Risk"
@@ -31,7 +31,7 @@ def greet(p1, p2, p3 , p4, p5, p6, p7):
     else:
         risk = "Low Risk"
     #return the NH percentage and risk classification
-    return int(outputs * 100), risk
+    return int(round(outputs * 100)), risk
 
 project = gr.Interface(
     fn=greet,
