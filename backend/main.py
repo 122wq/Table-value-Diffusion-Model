@@ -1,27 +1,37 @@
 import numpy as np
 import onnxruntime as ort
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel
 from scipy.special import softmax
 
 app = FastAPI(title="Diffusion Model Risk Predictor")
 
-# --- Enable CORS so your Flutter app is allowed to fetch data ---
+# Enable CORS for Flutter communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins (change to specific domains in production)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Load ONNX session
+# Mock database of clinical users
+USER_DATABASE = {
+    "doctor@clinic.com": "password123",
+    "admin": "admin123"
+}
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+# Load ONNX session once at startup
 try:
     sess = ort.InferenceSession("onnx_diffusion.onnx")
 except Exception as e:
     print(f"Error loading ONNX model: {e}")
     sess = None
+
 
 class PredictionData(BaseModel):
     cfbg: float
@@ -30,17 +40,39 @@ class PredictionData(BaseModel):
     bmi: float
     nraas_drug_use: float
     hypertension_history: float
-    # Enforces the 0-100 age constraint directly at the API gateway level:
-    age: float = Field(..., ge=0, le=100, description="Age must be between 0 and 100") 
+    age: float
 
 
+# --- Authentication Endpoint ---
+# This section will be changed to reflect authentication service provider.
+@app.post("/login")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user_password = USER_DATABASE.get(form_data.username)
+    if not user_password or user_password != form_data.password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # token response payload
+    return {
+        "access_token": f"token_for_{form_data.username}",
+        "token_type": "bearer"
+    }
+
+
+# --- Protected Prediction Endpoint ---
 @app.post("/predict")
-async def predict_data(data: PredictionData):
+async def predict_data(
+    data: PredictionData, 
+    token: str = Depends(oauth2_scheme)  # 2. FIX: Protect route with OAuth2 token dependency
+):
     if sess is None:
         raise HTTPException(status_code=500, detail="ONNX model is not loaded on the server.")
         
     try:
-        # 7 selected variables as input array
+        # Prepare 7 input variables
         cond_input = np.array([[
             data.cfbg, 
             data.cDBP, 
@@ -64,13 +96,10 @@ async def predict_data(data: PredictionData):
         output_fake = outputs[0]
         output_fake = softmax(output_fake, axis=1)
         
-        # Convert to a single layer array and extract scalar
-        val_numpy = output_fake[0, 1]
-        
-        # FIX: Safe conversion from numpy.float32 to native Python float
-        output_val = float(val_numpy)
+        # Extract scalar probability
+        output_val = float(output_fake[0, 1])
 
-        # Classify the patient risk
+        # Classify patient risk
         if output_val > 0.692:
             risk = "High Risk"
         elif output_val > 0.515:
@@ -78,7 +107,6 @@ async def predict_data(data: PredictionData):
         else:
             risk = "Low Risk"
 
-        # Return the NH percentage (as standard python int) and risk classification
         return {
             "prediction_percentage": int(round(output_val * 100)),
             "risk_level": risk
